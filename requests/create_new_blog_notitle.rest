@@ -2,8 +2,7 @@ POST http://localhost:3001/api/blogs
 Content-Type: application/json
 
 {
-  "title": "Laimea",
-  "author": "Julkaisija Kalle",
-  "url": "jokublogi.com",
+  "author": "Antti Kolehvainen",
+  "url": "tiettyblogi.com",
   "likes": 1000
 }
