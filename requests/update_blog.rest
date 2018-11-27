@@ -1,9 +1,9 @@
-POST http://localhost:3001/api/blogs
+PUT http://localhost:3001/api/blogs/5bfc57cacc7daf50b63328ea
 Content-Type: application/json
 
 {
   "title": "Poistettava Blogi",
   "author": "Masa Mainio",
   "url": "http://blogspot.com",
-  "likes": 10
+  "likes": 14
 }

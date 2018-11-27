@@ -78,6 +78,43 @@ describe('blog API tests', () => {
 
     expect(response.length).toBe(blogsBefore.length)
   })
+
+  test('Blog can be deleted', async () => {
+    const newBlog = initialBlogs[0]
+    delete newBlog._id
+
+    const addedBlog = await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
+
+    const blogsBeforeDelete = await blogsInDb()
+
+    await api
+      .delete(`/api/blogs/${addedBlog.body.id}`)
+      .expect(204)
+
+    const blogsAfterDelete = await blogsInDb()
+
+    expect(blogsAfterDelete).not.toContainEqual(addedBlog)
+    expect(blogsAfterDelete.length).toEqual(blogsBeforeDelete.length - 1)
+  })
+
+  test('Blog can be modified', async () => {
+    const allBlogs = await blogsInDb()
+
+    const newBlog = { ...allBlogs[0] }
+    newBlog.likes += 1
+
+    const addedBlog = await api
+      .put(`/api/blogs/${newBlog.id}`)
+      .send(newBlog)
+      .expect(202)
+      .expect('Content-Type', /application\/json/)
+
+    expect(addedBlog.body.likes).toBe(allBlogs[0].likes + 1)
+  })
 })
 
 afterAll(() => {
