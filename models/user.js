@@ -3,7 +3,7 @@ const mongoose = require('mongoose')
 const userSchema = mongoose.Schema({
   username: String,
   name: String,
-  password: String,
+  passwordHash: String,
   isAdult: Boolean,
   blogs: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Blog' }]
 })

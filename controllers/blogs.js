@@ -1,6 +1,15 @@
+const jwt = require('jsonwebtoken')
 const blogsRouter = require('express').Router()
 const Blog = require('../models/blog')
 const User = require('../models/user')
+
+const getTokenFrom = (request) => {
+  const auth = request.get('authorization')
+  if (auth && auth.toLowerCase().startsWith('bearer ')) {
+    return auth.substring(7)
+  }
+  return null
+}
 
 blogsRouter.get('/', async (request, response) => {
   const blogs = await Blog
@@ -16,6 +25,14 @@ blogsRouter.get('/favicon.ico', (request, response) => {
 
 blogsRouter.post('/', async (request, response) => {
   try {
+    const token = getTokenFrom(request)
+    console.log(token)
+    const decodedToken = jwt.verify(token, process.env.SECRET)
+
+    if (!token || !decodedToken.id) {
+      return response.status(401).json({ error: 'token missing or invalid' })
+    }
+
     const blog = new Blog(request.body)
 
     if (!blog.likes) {
@@ -26,7 +43,7 @@ blogsRouter.post('/', async (request, response) => {
       return response.status(400).json({ error: 'title or url missing' })
     }
 
-    const user = await User.findById(request.body.userId)
+    const user = await User.findById(decodedToken.id)
     blog.user = user._id
 
     const savedBlog = await blog.save()
@@ -35,9 +52,13 @@ blogsRouter.post('/', async (request, response) => {
     await user.save()
 
     return response.json(Blog.format(savedBlog))
-  } catch (expection) {
-    console.log(expection)
-    return response.status(500).json({ error: 'server error' })
+  } catch (exception) {
+    if (exception.name === 'JsonWebTokenError') {
+      response.status(401).json({ error: exception.message })
+    } else {
+      console.log(exception)
+      response.status(500).json({ error: 'server error' })
+    }
   }
 })
 

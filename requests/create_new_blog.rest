@@ -1,10 +1,11 @@
 POST http://localhost:3001/api/blogs
 Content-Type: application/json
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Ik1hTWEiLCJpZCI6IjViZmYxZGM4MGVkODM1NmU3ODE5MDgwOCIsImlhdCI6MTU0MzQ0NzAxMn0.h7fUfEzRV7E5KJvc25H7lXuCGulZ8zJfEznP5P1xKOc
 
 {
   "title": "Uusi Blogi",
   "author": "Masa Mainio",
   "url": "http://blogspot.com",
   "likes": 10,
-  "userId": "5bfea8377a4ea73d68eab63b"
+  "userId": "5bff1dc80ed8356e78190808"
 }
