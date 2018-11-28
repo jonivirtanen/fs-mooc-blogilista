@@ -2,8 +2,9 @@ POST http://localhost:3001/api/blogs
 Content-Type: application/json
 
 {
-  "title": "Poistettava Blogi",
+  "title": "Uusi Blogi",
   "author": "Masa Mainio",
   "url": "http://blogspot.com",
-  "likes": 10
+  "likes": 10,
+  "userId": "5bfea8377a4ea73d68eab63b"
 }
