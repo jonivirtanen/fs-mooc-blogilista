@@ -25,7 +25,7 @@ blogsRouter.post('/', async (request, response) => {
     }
 
     const savedBlog = await blog.save()
-    return response.status(201).json(Blog.format(savedBlog))
+    return response.json(Blog.format(savedBlog))
   } catch (expection) {
     console.log(expection)
     return response.status(500).json({ error: 'server error' })
