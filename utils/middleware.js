@@ -10,6 +10,18 @@ const logger = (request, response, next) => {
   return next()
 }
 
+const tokenExtractor = (req, res, next) => {
+  const getTokenFrom = (request) => {
+    const auth = request.get('authorization')
+    if (auth && auth.toLowerCase().startsWith('bearer ')) {
+      return auth.substring(7)
+    }
+    return null
+  }
+  req.token = getTokenFrom(req)
+  next()
+}
+
 const error = (request, response) => {
   response.status(404).end()
 }
@@ -17,4 +29,5 @@ const error = (request, response) => {
 module.exports = {
   logger,
   error,
+  tokenExtractor
 }

@@ -3,14 +3,6 @@ const blogsRouter = require('express').Router()
 const Blog = require('../models/blog')
 const User = require('../models/user')
 
-const getTokenFrom = (request) => {
-  const auth = request.get('authorization')
-  if (auth && auth.toLowerCase().startsWith('bearer ')) {
-    return auth.substring(7)
-  }
-  return null
-}
-
 blogsRouter.get('/', async (request, response) => {
   const blogs = await Blog
     .find({})
@@ -25,11 +17,9 @@ blogsRouter.get('/favicon.ico', (request, response) => {
 
 blogsRouter.post('/', async (request, response) => {
   try {
-    const token = getTokenFrom(request)
-    console.log(token)
-    const decodedToken = jwt.verify(token, process.env.SECRET)
+    const decodedToken = jwt.verify(request.token, process.env.SECRET)
 
-    if (!token || !decodedToken.id) {
+    if (!request.token || !decodedToken.id) {
       return response.status(401).json({ error: 'token missing or invalid' })
     }
 
@@ -64,12 +54,23 @@ blogsRouter.post('/', async (request, response) => {
 
 blogsRouter.delete('/:id', async (request, response) => {
   try {
-    await Blog.findOneAndRemove(request.params.id)
+    const blogToBeRemoved = await Blog.findById(request.params.id)
+    const decodedToken = jwt.verify(request.token, process.env.SECRET)
 
-    response.status(204).end()
+    if (!request.token || !decodedToken.id) {
+      return response.status(401).json({ error: 'token missing or invalid' })
+    }
+
+    if (blogToBeRemoved.user.toString() === decodedToken.id) {
+      await blogToBeRemoved.remove()
+      response.status(204).end()
+    }
   } catch (exception) {
-    console.log(exception)
-    response.status(400).send({ error: 'no such id' })
+    if (exception.name === 'JsonWebTokenError') {
+      response.status(401).json({ error: exception.message })
+    } else {
+      response.status(400).send({ error: 'no such id' })
+    }
   }
 })
 
